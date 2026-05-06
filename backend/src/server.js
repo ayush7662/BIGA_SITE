@@ -16,8 +16,11 @@ connectDB();
 
 const app = express();
 app.use(cors());
-app.use(express.json());
-
+app.use(express.json({ verify: (req, res, buf) => {
+  req.rawBody = buf;
+  return buf;
+}}));
+app.post("/api/orders/webhook", express.raw({type: "application/json"}), (req, res) => orderRoutes(req, res));
 app.get("/", (_req, res) => res.send("BIG A Marketplace API running"));
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);

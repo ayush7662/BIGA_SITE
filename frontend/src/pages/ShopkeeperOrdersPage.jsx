@@ -22,7 +22,7 @@ const ShopkeeperOrdersPage = () => {
         <h2>Incoming Orders</h2>
         {orders.map((order) => (
           <div key={order._id} className="card">
-            <p>Order #{order._id.slice(-6)} - {order.status}</p>
+            <p>Order #{order._id.slice(-6)} - {order.status} - {order.paymentStatus}</p>
             <div className="row">
               <button className="btn secondary" onClick={() => setStatus(order._id, "processing")}>Processing</button>
               <button className="btn secondary" onClick={() => setStatus(order._id, "shipped")}>Shipped</button>

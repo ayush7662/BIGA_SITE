@@ -1,14 +1,24 @@
 const Product = require("../models/Product");
 const cloudinary = require("../config/cloudinary");
 
-const uploadToCloudinary = (buffer) =>
-  new Promise((resolve, reject) => {
+const uploadToCloudinary = (buffer) => {
+  console.log('Uploading image, buffer size:', buffer.length);
+  return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       { folder: "big-a-products" },
-      (error, result) => (error ? reject(error) : resolve(result))
+      (error, result) => {
+        if (error) {
+          console.error('Cloudinary upload error:', error.message);
+          reject(error);
+        } else {
+          console.log('Upload success:', result.secure_url);
+          resolve(result);
+        }
+      }
     );
     stream.end(buffer);
   });
+};
 
 const getProducts = async (req, res) => {
   try {
@@ -39,11 +49,14 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
   try {
+    console.log('Create product req.file:', !!req.file, req.file?.originalname);
     const { name, description, price, stock, category } = req.body;
     let image = "";
     if (req.file) {
       const uploadResult = await uploadToCloudinary(req.file.buffer);
       image = uploadResult.secure_url;
+    } else {
+      console.warn('No file received in createProduct');
     }
 
     const product = await Product.create({
@@ -57,6 +70,10 @@ const createProduct = async (req, res) => {
     });
     return res.status(201).json({ message: "Product created", product });
   } catch (error) {
+    console.error('Create product error:', error.message);
+    if (error.message.includes('Cloudinary') || error.message.includes('upload')) {
+      return res.status(400).json({ message: "Image upload failed", error: error.message });
+    }
     return res.status(500).json({ message: "Failed to create product", error: error.message });
   }
 };
@@ -70,8 +87,11 @@ const updateProduct = async (req, res) => {
 
   const updates = req.body;
   if (req.file) {
+    console.log('Update product req.file:', !!req.file, req.file?.originalname);
     const uploadResult = await uploadToCloudinary(req.file.buffer);
     updates.image = uploadResult.secure_url;
+  } else {
+    console.warn('No file received in updateProduct');
   }
 
   const updated = await Product.findByIdAndUpdate(req.params.id, updates, { new: true });

@@ -15,16 +15,24 @@ const orderItemSchema = new mongoose.Schema(
 const orderSchema = new mongoose.Schema(
   {
     customer: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    deliveryAddress: {
+      name: { type: String, required: true },
+      phone: { type: String, required: true },
+      address: { type: String, required: true },
+      city: { type: String, required: true },
+      state: { type: String, required: true },
+      pincode: { type: String, required: true }
+    },
     items: [orderItemSchema],
     totalAmount: { type: Number, required: true, min: 0 },
     status: {
       type: String,
-      enum: ["processing", "shipped", "delivered"],
-      default: "processing",
+      enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
+      default: "pending",
     },
     paymentStatus: { type: String, default: "pending" },
   },
   { timestamps: true }
-);
+); 
 
 module.exports = mongoose.model("Order", orderSchema);

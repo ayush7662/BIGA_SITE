@@ -7,6 +7,7 @@ const ManageProductsPage = () => {
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState([]);
   const [form, setForm] = useState({ name: "", description: "", price: "", stock: "", category: "" });
+  const [imageFile, setImageFile] = useState(null);
 
   const load = async () => setProducts((await api.get("/products")).data);
   useEffect(() => { load(); }, []);
@@ -15,9 +16,13 @@ const ManageProductsPage = () => {
     e.preventDefault();
     const payload = new FormData();
     Object.entries(form).forEach(([key, value]) => payload.append(key, value));
+    if (imageFile) {
+      payload.append("image", imageFile);
+    }
     await api.post("/products", payload);
     toast.success("Product added");
     setForm({ name: "", description: "", price: "", stock: "", category: "" });
+    setImageFile(null);
     load();
   };
 
@@ -37,7 +42,8 @@ const ManageProductsPage = () => {
         <input type="number" placeholder="Price" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
         <input type="number" placeholder="Stock" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} />
         <input placeholder="Category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
-        <button className="btn">Add</button>
+        <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files[0])} />
+        <button className="btn">Add Product</button>
       </form>
       <div className="grid">
         {products.map((p) => (

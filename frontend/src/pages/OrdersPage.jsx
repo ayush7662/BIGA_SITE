@@ -12,7 +12,11 @@ const OrdersPage = () => {
       <Navbar search={search} setSearch={setSearch} />
       <div className="card">
         <h2>Order History</h2>
-        {orders.map((order) => <p key={order._id}>Order #{order._id.slice(-6)} - {order.status} - Rs. {order.totalAmount}</p>)}
+        {orders.map((order) => (
+          <p key={order._id}>
+            Order #{order._id.slice(-6)} - {order.status} - {order.paymentStatus} - Rs. {order.totalAmount}
+          </p>
+        ))}
       </div>
     </div>
   );

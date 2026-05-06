@@ -13,7 +13,7 @@ const Navbar = ({ search, setSearch }) => {
   return (
     <nav className="nav">
       <Link to="/" className="logo">
-        BIG A
+        B G A Y S H
       </Link>
       {user && (
         <>
