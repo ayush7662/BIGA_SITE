@@ -1,12 +1,16 @@
 const express = require("express");
 const cors = require("cors");
+
 const dotenv = require("dotenv");
-const path = require("path");
 
 const connectDB = require("./config/db");
 require("./config/cloudinary");
 
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
+
+dotenv.config();
+
+// DB Connection
+connectDB();
 
 const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
@@ -14,41 +18,23 @@ const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
 
-// DB Connection
-connectDB();
-
 const app = express();
 
-// CORS
+// CORS (safe for initial deploy)
 app.use(
   cors({
-    origin: true,
+    origin: true, // later replace with frontend URL
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-// Body Parsers
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Debug middleware for auth routes
-app.use("/api/auth", (req, res, next) => {
-  console.log(
-    "[DEBUG AUTH]",
-    req.method,
-    req.path,
-    "content-type=",
-    req.headers["content-type"]
-  );
 
-  console.log("[DEBUG BODY]", req.body);
-
-  next();
-});
-
-// Root Route
 app.get("/", (_req, res) => {
   res.send("BIG A Marketplace API running");
 });
@@ -71,13 +57,6 @@ app.use((req, res) => {
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error("[SERVER ERROR]", err);
-
-  if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid JSON payload",
-    });
-  }
 
   res.status(500).json({
     success: false,
