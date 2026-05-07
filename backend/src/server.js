@@ -22,19 +22,16 @@ const app = express();
 // CORS
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "https://big-a-ecommerce-site.vercel.app",
-    ],
+    origin: true,
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-// JSON Parser
+// Body Parsers
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Debug middleware for auth routes
 app.use("/api/auth", (req, res, next) => {
@@ -75,7 +72,6 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error("[SERVER ERROR]", err);
 
-  // JSON Parse Error
   if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
     return res.status(400).json({
       success: false,
@@ -85,7 +81,7 @@ app.use((err, req, res, next) => {
 
   res.status(500).json({
     success: false,
-    message: "Internal Server Error",
+    message: err.message || "Internal Server Error",
   });
 });
 
