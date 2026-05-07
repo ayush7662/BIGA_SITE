@@ -46,16 +46,22 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // Helps diagnose env loading/token signing issues
+    console.log('Login token signing: JWT_SECRET set =', !!process.env.JWT_SECRET);
+
     const token = generateToken({ id: user._id, role: user.role });
     return res.status(200).json({
       message: "Login successful",
       token,
       user: { id: user._id, name: user.name, email: user.email, role: user.role },
     });
+
   } catch (error) {
+    // Surface JWT_SECRET misconfiguration / token signing issues clearly
     return res.status(500).json({ message: "Login failed", error: error.message });
   }
 };
+
 
 const forgotPassword = async (req, res) => {
   try {
