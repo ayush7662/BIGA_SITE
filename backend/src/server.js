@@ -23,7 +23,7 @@ const app = express();
 // CORS (safe for initial deploy)
 app.use(
   cors({
-    origin:"https://backend-f4cv.onrender.com/",
+    origin:"https://biga-site.vercel.app",
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
